@@ -1,4 +1,4 @@
-const API_BASE = 'http://127.0.0.1:8081';
+const API_BASE = 'https://gbot.neforbg.workers.dev';
 
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0b0c0f'); tg.setBackgroundColor('#0b0c0f'); }
@@ -35,14 +35,14 @@ function setWinzone(pct) {
 
 function spinRing(roll, chance, onDone) {
   const dot = $('dot');
-  const finalAngle = (roll / 100) * 360;      
-  const total = 360 * 4 + finalAngle;              
+  const finalAngle = (roll / 100) * 360;           // где реально выпал ролл (0 = верх, по часовой)
+  const total = 360 * 4 + finalAngle;              // 4 полных оборота + докрутка
   const dur = 3400, start = performance.now();
   function frame(now) {
     const t = Math.min(1, (now - start) / dur);
-    const ease = 1 - Math.pow(1 - t, 3);        
+    const ease = 1 - Math.pow(1 - t, 3);            // ease-out cubic
     const angle = total * ease;
-    const rad = (angle - 90) * Math.PI / 180;      
+    const rad = (angle - 90) * Math.PI / 180;       // 0° = верх круга
     dot.setAttribute('cx', 160 + R * Math.cos(rad));
     dot.setAttribute('cy', 160 + R * Math.sin(rad));
     if (t < 1) requestAnimationFrame(frame);
@@ -51,6 +51,7 @@ function spinRing(roll, chance, onDone) {
   requestAnimationFrame(frame);
 }
 
+/* ---------- состояние ---------- */
 function renderMe(me) {
   ME = me;
   $('balance').textContent = fmt(me.balance);
@@ -81,6 +82,7 @@ function clampBet(v) {
   return Math.floor(v);
 }
 
+/* ---------- ставки ---------- */
 async function placeBet() {
   if (spinning) return;
   spinning = true;
@@ -94,7 +96,7 @@ async function placeBet() {
             bad_amount: `Ставка от ${ME.min_bet} до ${ME.max_bet}★` }[res.error] || res.error);
     return;
   }
-  
+  // анимация: докрутка к выпавшему ролику
   $('result-banner').style.visibility = 'hidden';
   spinRing(res.roll, res.chance, async () => {
     const banner = $('result-banner');
@@ -113,7 +115,7 @@ async function placeBet() {
   });
 }
 
-
+/* ---------- тикер и история ---------- */
 function tickerItem(b) {
   const el = document.createElement('span');
   el.className = 'ticker-item';
@@ -156,6 +158,7 @@ async function openProfile() {
   $('profile-modal').classList.add('open');
 }
 
+/* ---------- пополнить / вывести ---------- */
 let amountMode = 'deposit';
 function openAmount(mode) {
   amountMode = mode;
@@ -187,6 +190,7 @@ async function submitAmount() {
   }
 }
 
+/* ---------- init ---------- */
 function offline(on) {
   const b = document.getElementById('result-banner');
   if (!b) return;
