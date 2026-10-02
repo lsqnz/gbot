@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>LoreGram Upgrader</title>
+<link rel="stylesheet" href="style.css?v=3">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <button class="ghost-btn icon-btn" id="btn-profile">👤</button>
+    <div class="balance-pill">
+      <span>баланс:</span> <b id="balance">0</b> <span class="dim">зв.</span>
+      <button class="plus" id="btn-plus">+</button>
+    </div>
+    <button class="ghost-btn" id="btn-history">история</button>
+  </div>
+
+  <div class="ticker">
+    <div class="ticker-track" id="ticker"><span class="ticker-item dim">апгрейдер ждёт первую победу…</span></div>
+  </div>
+
+  <div class="modes">
+    <button class="mode active">⚡ апгрейдер</button>
+  </div>
+
+  <div class="card ring-card">
+    <div class="ring-wrap">
+      <svg viewBox="0 0 320 320" class="ring-svg">
+        <circle class="track" cx="160" cy="160" r="130"/>
+        <circle class="winzone" id="winzone" cx="160" cy="160" r="130"/>
+        <circle class="dot" id="dot" cx="160" cy="30" r="11"/>
+      </svg>
+      <div class="ring-center">
+        <div class="mult" id="ring-mult">1.50x</div>
+        <div class="chance" id="ring-chance">шанс: 63.33%</div>
+        <div class="target" id="ring-target">+1 500 звёзд</div>
+      </div>
+    </div>
+    <div class="result-banner" id="result-banner" style="visibility:hidden"></div>
+  </div>
+
+  <div class="card bet-card">
+    <div class="bet-label">
+      <span>сумма ставки</span>
+      <span class="pillbtns">
+        <button id="btn-half">1/2</button>
+        <button id="btn-double">2x</button>
+        <button id="btn-max">max</button>
+      </span>
+    </div>
+    <div class="bet-input">
+      <input id="bet" inputmode="numeric" value="1000">
+      <span class="dim">звёзд</span>
+    </div>
+    <div class="mult-label">
+      <span>множитель</span>
+      <span id="chance-right">63.33% шанс</span>
+    </div>
+    <div class="mult-row" id="mult-row"></div>
+    <button class="upgrade-btn" id="btn-bet">
+      <div class="up-title">апгрейдить</div>
+      <div class="up-target" id="target-line">цель: 1 500 звёзд</div>
+    </button>
+    <div class="action-row">
+      <button class="half-btn" id="btn-deposit">пополнить</button>
+      <button class="half-btn" id="btn-withdraw">вывести</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- модалка: история -->
+<div class="modal" id="history-modal">
+  <div class="modal-card">
+    <div class="modal-head"><b>история игр</b><button class="close" data-close>✕</button></div>
+    <div class="hist-table">
+      <div class="hist-head"><span>ставка</span><span>множитель</span><span>шанс</span><span>ролл</span><span>исход</span></div>
+      <div id="hist-rows"></div>
+    </div>
+  </div>
+</div>
+
+<!-- модалка: профиль -->
+<div class="modal" id="profile-modal">
+  <div class="modal-card">
+    <div class="modal-head"><b>профиль</b><button class="close" data-close>✕</button></div>
+    <div id="profile-body" class="profile"></div>
+  </div>
+</div>
+
+<!-- модалка: сумма пополнения/вывода -->
+<div class="modal" id="amount-modal">
+  <div class="modal-card">
+    <div class="modal-head"><b id="amount-title">пополнить</b><button class="close" data-close>✕</button></div>
+    <div class="amount-input"><input id="amount" inputmode="numeric" placeholder="сумма в звёздах"><span class="dim">★</span></div>
+    <button class="upgrade-btn" id="amount-ok">продолжить</button>
+    <div class="amount-hint" id="amount-hint"></div>
+  </div>
+</div>
+
+<script src="app.js?v=3"></script>
+</body>
+</html>
