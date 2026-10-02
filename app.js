@@ -1,14 +1,23 @@
-/* LoreGram/StaticGram Upgrader — WebApp */
+const API_BASE = 'http://127.0.0.1:8081';
+
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0b0c0f'); tg.setBackgroundColor('#0b0c0f'); }
 
 const API = {
   headers: () => ({ 'Content-Type': 'application/json', 'X-Init-Data': tg?.initData || '' }),
-  async get(path) { const r = await fetch(path, { headers: this.headers() }); return r.json(); },
-  async post(path, body) { const r = await fetch(path, { method: 'POST', headers: this.headers(), body: JSON.stringify(body || {}) }); return r.json(); },
+  async get(path) { const r = await fetch(API_BASE + path, { headers: this.headers() }); return r.json(); },
+  async post(path, body) { const r = await fetch(API_BASE + path, { method: 'POST', headers: this.headers(), body: JSON.stringify(body || {}) }); return r.json(); },
 };
 
-let ME = null;
+const DEFAULTS = {
+  balance: 0, deposited: 0, withdrawn: 0, total_bet: 0, total_won: 0, bets_count: 0,
+  multipliers: [1.5, 2.0, 3.0, 5.0, 10.0, 50.0, 100.0], house_pct: 95,
+  max_bet: 10000, min_bet: 10,
+};
+DEFAULTS.chances = Object.fromEntries(
+  DEFAULTS.multipliers.map(m => [String(m), Math.round(DEFAULTS.house_pct / m * 100) / 100]));
+
+let ME = DEFAULTS;
 let multiplier = 1.5;
 let spinning = false;
 
@@ -26,14 +35,14 @@ function setWinzone(pct) {
 
 function spinRing(roll, chance, onDone) {
   const dot = $('dot');
-  const finalAngle = (roll / 100) * 360;           // где реально выпал ролл (0 = верх, по часовой)
-  const total = 360 * 4 + finalAngle;              // 4 полных оборота + докрутка
+  const finalAngle = (roll / 100) * 360;      
+  const total = 360 * 4 + finalAngle;              
   const dur = 3400, start = performance.now();
   function frame(now) {
     const t = Math.min(1, (now - start) / dur);
-    const ease = 1 - Math.pow(1 - t, 3);            // ease-out cubic
+    const ease = 1 - Math.pow(1 - t, 3);        
     const angle = total * ease;
-    const rad = (angle - 90) * Math.PI / 180;       // 0° = верх круга
+    const rad = (angle - 90) * Math.PI / 180;      
     dot.setAttribute('cx', 160 + R * Math.cos(rad));
     dot.setAttribute('cy', 160 + R * Math.sin(rad));
     if (t < 1) requestAnimationFrame(frame);
@@ -42,7 +51,6 @@ function spinRing(roll, chance, onDone) {
   requestAnimationFrame(frame);
 }
 
-/* ---------- состояние ---------- */
 function renderMe(me) {
   ME = me;
   $('balance').textContent = fmt(me.balance);
@@ -73,7 +81,6 @@ function clampBet(v) {
   return Math.floor(v);
 }
 
-/* ---------- ставки ---------- */
 async function placeBet() {
   if (spinning) return;
   spinning = true;
@@ -87,7 +94,7 @@ async function placeBet() {
             bad_amount: `Ставка от ${ME.min_bet} до ${ME.max_bet}★` }[res.error] || res.error);
     return;
   }
-  // анимация: докрутка к выпавшему ролику
+  
   $('result-banner').style.visibility = 'hidden';
   spinRing(res.roll, res.chance, async () => {
     const banner = $('result-banner');
@@ -106,7 +113,7 @@ async function placeBet() {
   });
 }
 
-/* ---------- тикер и история ---------- */
+
 function tickerItem(b) {
   const el = document.createElement('span');
   el.className = 'ticker-item';
@@ -149,7 +156,6 @@ async function openProfile() {
   $('profile-modal').classList.add('open');
 }
 
-/* ---------- пополнить / вывести ---------- */
 let amountMode = 'deposit';
 function openAmount(mode) {
   amountMode = mode;
@@ -181,8 +187,26 @@ async function submitAmount() {
   }
 }
 
-/* ---------- init ---------- */
-function refresh() { API.get('/api/me').then(renderMe); loadFeed(); }
+function offline(on) {
+  const b = document.getElementById('result-banner');
+  if (!b) return;
+  b.style.visibility = 'visible';
+  b.className = 'result-banner lose';
+  b.textContent = on ? 'нет связи с сервером — запусти start-backend.bat' : '';
+}
+
+async function refresh() {
+  try {
+    const me = await API.get('/api/me');
+    if (me.error) throw new Error(me.error);
+    offline(false);
+    renderMe(me);
+    loadFeed();
+  } catch (e) {
+    renderMe(DEFAULTS);
+    offline(true);
+  }
+}
 
 $('btn-bet').onclick = placeBet;
 $('btn-history').onclick = openHistory;
