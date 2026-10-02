@@ -16,7 +16,6 @@ body {
 .app { max-width: 520px; margin: 0 auto; padding: 12px 12px 0; display: flex; flex-direction: column; gap: 10px; }
 .dim { color: var(--dim); }
 
-/* верхняя панель */
 .topbar { display: flex; gap: 8px; align-items: center; }
 .topbar .spacer { flex: 1; }
 .balance-pill {
@@ -34,7 +33,6 @@ body {
 }
 .icon-btn { padding: 8px 12px; font-size: 16px; }
 
-/* тикер побед */
 .ticker { overflow: hidden; border-radius: 14px; background: var(--card2); border: 1px solid var(--line); }
 .ticker-track { display: flex; gap: 8px; padding: 8px; width: max-content; animation: slide 14s linear infinite; }
 .ticker-item {
@@ -44,7 +42,6 @@ body {
 .ticker-item .mult-badge { background: #000; border-radius: 8px; padding: 2px 8px; font-weight: 700; }
 @keyframes slide { from { transform: translateX(-50%); } to { transform: translateX(0); } }
 
-/* режимы */
 .modes { display: flex; }
 .mode {
   width: 100%; background: var(--card); border: 1px solid var(--line); color: var(--text);
@@ -52,10 +49,8 @@ body {
 }
 .mode.active { background: var(--white); color: #000; border: none; font-weight: 700; }
 
-/* карточки */
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 16px; }
 
-/* кольцо */
 .ring-card { display: flex; flex-direction: column; gap: 12px; align-items: center; }
 .ring-wrap { position: relative; width: 280px; height: 280px; }
 .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
@@ -80,7 +75,6 @@ body {
 .result-banner.win { border-color: #fff; }
 .result-banner.lose { color: var(--dim); }
 
-/* ставки */
 .bet-card { display: flex; flex-direction: column; gap: 12px; }
 .bet-label, .mult-label { display: flex; justify-content: space-between; align-items: center; color: var(--dim); }
 #chance-right { color: var(--text); }
@@ -115,7 +109,6 @@ body {
   border-radius: 14px; padding: 14px; cursor: pointer; font-size: 15px; font-weight: 600;
 }
 
-/* модалки */
 .modal {
   display: none; position: fixed; inset: 0; background: rgba(0,0,0,.72);
   z-index: 50; align-items: center; justify-content: center; padding: 16px;
@@ -129,7 +122,6 @@ body {
 .modal-head b { font-size: 17px; }
 .close { background: none; border: none; color: var(--dim); font-size: 16px; cursor: pointer; }
 
-/* история */
 .hist-head, .hist-row {
   display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 4px;
   padding: 10px 8px; margin-bottom: 6px; text-align: center;
@@ -139,11 +131,9 @@ body {
 .hist-row.win { border-color: #fff; }
 .hist-row.lose { color: var(--dim); border-color: var(--line); opacity: .55; }
 
-/* профиль */
 .profile { display: flex; flex-direction: column; gap: 8px; font-size: 15px; }
 .profile .row { display: flex; justify-content: space-between; }
 
-/* сумма */
 .amount-input {
   background: var(--card2); border: 1px solid var(--line); border-radius: 14px;
   padding: 14px 16px; display: flex; justify-content: space-between; align-items: center;
