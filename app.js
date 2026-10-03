@@ -1,12 +1,16 @@
+/* LoreGram/StaticGram Upgrader — WebApp */
+// === НАСТРОЙКА: адрес бэкенда (API) ===
+// Локальный тест на ПК:  http://127.0.0.1:8081
+// Прод (VPS/https):      https://upgrader-api.staticgram.top  (пример)
 const API_BASE = 'https://gbot.neforbg.workers.dev';
 
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0b0c0f'); tg.setBackgroundColor('#0b0c0f'); }
 
 const API = {
-  headers: () => ({ 'Content-Type': 'application/json', 'X-Init-Data': tg?.initData || '' }),
-  async get(path) { const r = await fetch(API_BASE + path, { headers: this.headers() }); return r.json(); },
-  async post(path, body) { const r = await fetch(API_BASE + path, { method: 'POST', headers: this.headers(), body: JSON.stringify(body || {}) }); return r.json(); },
+  hdr() { return { 'Content-Type': 'application/json', 'X-Init-Data': tg?.initData || '' }; },
+  async get(path) { const r = await fetch(API_BASE + path, { headers: this.hdr() }); return r.json(); },
+  async post(path, body) { const r = await fetch(API_BASE + path, { method: 'POST', headers: this.hdr(), body: JSON.stringify(body || {}) }); return r.json(); },
 };
 
 const DEFAULTS = {
@@ -191,24 +195,26 @@ async function submitAmount() {
 }
 
 /* ---------- init ---------- */
-function offline(on) {
+function offline(on, detail) {
   const b = document.getElementById('result-banner');
   if (!b) return;
   b.style.visibility = 'visible';
   b.className = 'result-banner lose';
-  b.textContent = on ? 'нет связи с сервером — запусти start-backend.bat' : '';
+  b.textContent = on ? ('нет связи ' + (detail || '')) : '';
 }
 
 async function refresh() {
+  const hasId = tg && tg.initData ? 'есть(' + tg.initData.length + 'симв)' : 'ПУСТО';
   try {
-    const me = await API.get('/api/me');
-    if (me.error) throw new Error(me.error);
+    const r = await fetch(API_BASE + '/api/me', { headers: this.hdr() });
+    const me = await r.json();
+    if (r.status !== 200 || me.error) throw new Error(r.status + ' ' + JSON.stringify(me).slice(0, 80));
     offline(false);
     renderMe(me);
     loadFeed();
   } catch (e) {
     renderMe(DEFAULTS);
-    offline(true);
+    offline(true, '[' + e.message + '] initData ' + hasId);
   }
 }
 
