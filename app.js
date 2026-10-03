@@ -180,8 +180,11 @@ async function submitAmount() {
   if (amountMode === 'deposit') {
     const res = await API.post('/api/deposit-link', { amount });
     if (res.url) {
-      if (tg) tg.openInvoice(res.url);
-      else window.open(res.url);
+      // StaticGram: openInvoice принимает только t.me/$<slug>
+      let inv = res.url;
+      if (inv.includes('staticgram.top/invoice/')) inv = 'https://t.me/$' + inv.split('/').pop();
+      if (tg) tg.openInvoice(inv);
+      else window.open(inv);
       $('amount-modal').classList.remove('open');
     } else alert(res.description || res.error);
   } else {
