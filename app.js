@@ -206,7 +206,7 @@ function offline(on, detail) {
 async function refresh() {
   const hasId = tg && tg.initData ? 'есть(' + tg.initData.length + 'симв)' : 'ПУСТО';
   try {
-    const r = await fetch(API_BASE + '/api/me', { headers: this.hdr() });
+    const r = await fetch(API_BASE + '/api/me', { headers: API.hdr() });
     const me = await r.json();
     if (r.status !== 200 || me.error) throw new Error(r.status + ' ' + JSON.stringify(me).slice(0, 80));
     offline(false);
